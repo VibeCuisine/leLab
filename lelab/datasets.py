@@ -184,6 +184,12 @@ def handle_list_episodes(repo_id: str) -> dict[str, Any]:
         logger.warning(f"Could not list episodes for {repo_id}: {e}")
         return {"success": False, "message": f"Could not read dataset: {e}"}
 
+    if not rows and info.get("total_episodes"):
+        return {
+            "success": False,
+            "message": f"{repo_id} has no episode index: the recording was interrupted before it finished writing.",
+        }
+
     return {
         "success": True,
         "repo_id": repo_id,

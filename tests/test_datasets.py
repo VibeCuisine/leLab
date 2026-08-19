@@ -141,6 +141,17 @@ def test_list_episodes_returns_rows(client: TestClient, browsable_dataset: str) 
     assert [e["episode_index"] for e in body["episodes"]] == [0, 1, 2]
 
 
+def test_list_episodes_reports_failure_when_index_missing(
+    client: TestClient, tmp_lerobot_home: Path, browsable_dataset: str
+) -> None:
+    import shutil
+
+    shutil.rmtree(tmp_lerobot_home / browsable_dataset / "meta" / "episodes")
+    r = client.get("/dataset-episodes", params={"repo_id": browsable_dataset})
+    assert r.status_code == 200
+    assert r.json()["success"] is False
+
+
 def test_episode_detail_reports_neighbours(client: TestClient, browsable_dataset: str) -> None:
     r = client.get("/dataset-episode", params={"repo_id": browsable_dataset, "episode_index": 1})
     body = r.json()
